@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QFX Product Portal - Professional Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landingPage" class="landing-page">
+        <div class="landing-container">
+            <div class="landing-logo">QFX Portal</div>
+            <div class="landing-subtitle">Professional QFX Product Management System</div>
+            <div class="landing-buttons">
+                <button class="btn-landing btn-guest" onclick="continueAsGuest()">👤 Continue as Guest</button>
+                <button class="btn-landing btn-admin" onclick="showLoginModal()">🔐 Login as Admin</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="appContainer">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-logo">QFX Product Portal</div>
+            <div class="header-user-status" id="userStatus">Welcome</div>
+            <div class="header-buttons">
+                <button class="edit-mode-btn" id="editModeBtn" onclick="toggleEditMode()">✏️ Edit Mode</button>
+                <button class="logout-btn" id="logoutBtn" onclick="handleLogout()" style="display:none;">🚪 Logout</button>
+            </div>
+        </div>
+
+        <!-- Main Content Wrapper -->
+        <div style="display: flex; min-height: calc(100vh - 80px);">
+            <!-- Sidebar Navigation -->
+            <div class="sidebar">
+                <div style="font-weight: 700; color: var(--primary-color); margin-bottom: 15px; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Menu</div>
+                <div class="nav-item active" onclick="showSection('dashboard')">📊 Dashboard</div>
+                <div class="nav-item" onclick="showSection('products')">📦 Products</div>
+                
+                <div style="margin-top: 25px; font-weight: 700; color: var(--primary-color); margin-bottom: 12px; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Resources</div>
+                <div class="nav-item" onclick="showSection('documentation')">📖 Documentation</div>
+                <div class="nav-item" onclick="showSection('features')">⭐ Features</div>
+                <div class="nav-item" onclick="showSection('hardware')">🔧 Hardware</div>
+                <div class="nav-item" onclick="showSection('specifications')">📋 Specifications</div>
+
+                <!-- Admin Tools -->
+                <div id="adminTools">
+                    <div class="admin-tools-title">⚙️ Admin Tools</div>
+                    <button class="admin-btn" onclick="showAddProductForm()">+ Add Product</button>
+                    <button class="admin-btn" onclick="exportData()">💾 Export Data</button>
+                    <button class="admin-btn" onclick="showImportForm()">📥 Import Data</button>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Dashboard Section -->
+                <div id="dashboardSection" class="content-section active">
+                    <div class="section-title">📊 Dashboard</div>
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalProducts">0</div>
+                            <div class="stat-label">Total Products</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalDocumentation">0</div>
+                            <div class="stat-label">Documentation</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalFeatures">0</div>
+                            <div class="stat-label">Total Features</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalHardware">0</div>
+                            <div class="stat-label">Hardware Items</div>
+                        </div>
+                    </div>
+                    <div id="recentProducts"></div>
+                </div>
+
+                <!-- Products Section -->
+                <div id="productsSection" class="content-section">
+                    <div class="section-title">📦 QFX Products</div>
+                    <div class="products-grid" id="productsList"></div>
+                </div>
+
+                <!-- Product Details Section -->
+                <div id="productDetailsSection">
+                    <div class="product-header">
+                        <div style="flex: 1;">
+                            <h1 id="productName" style="font-size: 28px; color: var(--primary-color); margin: 0;">Product Name</h1>
+                        </div>
+                        <button class="back-button" onclick="goBackToProducts()">← Back to Products</button>
+                        <div id="deleteProductContainer" style="display: none;">
+                            <button class="btn btn-danger" onclick="deleteProduct()">🗑️ Delete Product</button>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="tabs-container">
+                        <div class="tabs-header">
+                            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+                            <button class="tab-btn" onclick="switchTab('specifications')">Specifications</button>
+                            <button class="tab-btn" onclick="switchTab('features')">Features</button>
+                            <button class="tab-btn" onclick="switchTab('documentation')">Documentation</button>
+                            <button class="tab-btn" onclick="switchTab('hardware')">Hardware</button>
+                            <button class="tab-btn" onclick="switchTab('releases')">Releases</button>
+                            <button class="tab-btn" onclick="switchTab('roadmap')">Roadmap</button>
+                        </div>
+
+                        <div class="tabs-content">
+                            <!-- Overview Tab -->
+                            <div id="overviewTab" class="tab-content active"></div>
+
+                            <!-- Specifications Tab -->
+                            <div id="specificationsTab" class="tab-content"></div>
+
+                            <!-- Features Tab -->
+                            <div id="featuresTab" class="tab-content"></div>
+
+                            <!-- Documentation Tab -->
+                            <div id="documentationTab" class="tab-content"></div>
+
+                            <!-- Hardware Tab -->
+                            <div id="hardwareTab" class="tab-content"></div>
+
+                            <!-- Releases Tab -->
+                            <div id="releasesTab" class="tab-content"></div>
+
+                            <!-- Roadmap Tab -->
+                            <div id="roadmapTab" class="tab-content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation Section -->
+                <div id="documentationSection" class="content-section">
+                    <div class="section-title">📖 Documentation</div>
+                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: var(--shadow);">
+                        <p>Select a product to view detailed documentation including Device Essentials, Setup Instructions, and Management Guides.</p>
+                    </div>
+                </div>
+
+                <!-- Features Section -->
+                <div id="featuresSection" class="content-section">
+                    <div class="section-title">⭐ Features</div>
+                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: var(--shadow);">
+                        <p>Browse all QFX product features and capabilities from the Products section.</p>
+                    </div>
+                </div>
+
+                <!-- Hardware Section -->
+                <div id="hardwareSection" class="content-section">
+                    <div class="section-title">🔧 Hardware Compatibility</div>
+                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: var(--shadow);">
+                        <p>View hardware compatibility including transceivers, power supplies, cables, adapters, and rack mounting options from the Products section.</p>
+                    </div>
+                </div>
+
+                <!-- Specifications Section -->
+                <div id="specificationsSection" class="content-section">
+                    <div class="section-title">📋 Specifications</div>
+                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: var(--shadow);">
+                        <p>Access detailed technical specifications for all QFX products from the Products section.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Admin Login</div>
+                <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+            </div>
+            <form onsubmit="handleAdminLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="loginEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="loginPassword" class="form-input" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">Login</button>
+                <button type="button" class="btn btn-secondary" style="width: 100%;" onclick="showSignupModal()">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Create Admin Account</div>
+                <button class="close-btn" onclick="closeSignupModal()">&times;</button>
+            </div>
+            <form onsubmit="handleAdminSignup(event)">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="signupName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="signupEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="signupPassword" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Secret Key</label>
+                    <input type="password" id="signupSecretKey" class="form-input" placeholder="Enter secret key" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">Create Account</button>
+                <button type="button" class="btn btn-secondary" style="width: 100%;" onclick="showLoginModal()">Back to Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Message Toast -->
+    <div id="messageToast" class="message-toast"></div>
+
+    <!-- Scripts -->
+    <script src="auth.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+
+    <!-- Additional Inline Functions -->
+    <script>
+        // Modal Management
+        function showLoginModal() {
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('landingPage').classList.remove('hidden');
+        }
+
+        function showSignupModal() {
+            document.getElementById('loginModal').classList.remove('active');
+            document.getElementById('signupModal').classList.add('active');
+        }
+
+        function closeSignupModal() {
+            document.getElementById('signupModal').classList.remove('active');
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        // Authentication Functions
+        function continueAsGuest() {
+            authManager.loginGuest();
+            document.getElementById('landingPage').classList.add('hidden');
+            initializeApp();
+        }
+
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const result = authManager.login(email, password);
+            if (result.success) {
+                closeLoginModal();
+                document.getElementById('landingPage').classList.add('hidden');
+                initializeApp();
+                showMessage('Login successful!', 'success');
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+
+        function handleAdminSignup(event) {
+            event.preventDefault();
+            const fullName = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const secretKey = document.getElementById('signupSecretKey').value;
+
+            const result = authManager.signup(fullName, email, password, secretKey);
+            if (result.success) {
+                closeSignupModal();
+                document.getElementById('landingPage').classList.add('hidden');
+                initializeApp();
+                showMessage('Account created and logged in!', 'success');
+            } else {
+                showMessage(result.message, 'error');
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                authManager.logout();
+                document.getElementById('appContainer').classList.remove('active');
+                document.getElementById('landingPage').classList.remove('hidden');
+                location.reload();
+            }
+        }
+
+        // Navigation Functions
+        function goBackToProducts() {
+            document.getElementById('productDetailsSection').style.display = 'none';
+            document.getElementById('productsSection').style.display = 'block';
+        }
+
+        // Tab Content Setup
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            const tabId = tabName + 'Tab';
+            const tabElement = document.getElementById(tabId);
+            if (tabElement) {
+                tabElement.classList.add('active');
+            }
+
+            // Add active class to clicked button
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+
+        // Handle tab content rendering
+        const originalRenderOverview = renderOverview;
+        renderOverview = function() {
+            const html = `
+                <div class="editable-content">
+                    <h3>Product Overview</h3>
+                    <p>${currentProduct.overview}</p>
+                </div>
+            `;
+            document.getElementById('overviewTab').innerHTML = html;
+            if (editMode && authManager.isAdmin()) {
+                makeEditable('overviewTab');
+            }
+        };
+
+        const originalRenderSpecifications = renderSpecifications;
+        renderSpecifications = function() {
+            const specs = currentProduct.specifications;
+            const html = `
+                <div class="editable-content">
+                    <h3>Technical Specifications</h3>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        ${Object.entries(specs).map(([key, value]) => `
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding: 10px; font-weight: 600; width: 30%;">${key.replace(/([A-Z])/g, ' $1').trim()}</td>
+                                <td style="padding: 10px;">${value}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                </div>
+            `;
+            document.getElementById('specificationsTab').innerHTML = html;
+            if (editMode && authManager.isAdmin()) {
+                makeEditable('specificationsTab');
+            }
+        };
+
+        const originalRenderFeatures = renderFeatures;
+        renderFeatures = function() {
+            const html = `
+                <div class="editable-content">
+                    <h3>Key Features</h3>
+                    <ul>
+                        ${currentProduct.features.map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            document.getElementById('featuresTab').innerHTML = html;
+            if (editMode && authManager.isAdmin()) {
+                makeEditable('featuresTab');
+            }
+        };
+
+        const originalRenderDocumentation = renderDocumentation;
+        renderDocumentation = function() {
+            const docs = currentProduct.documentation;
+            const html = `
+                <div class="editable-content">
+                    <h3>Device Essentials</h3>
+                    <p>${docs.deviceEssentials}</p>
+                    
+                    <h3>Set Up</h3>
+                    <p>${docs.setUp}</p>
+                    
+                    <h3>Manage</h3>
+                    <p>${docs.manage}</p>
+                </div>
+            `;
+            document.getElementById('documentationTab').innerHTML = html;
+            if (editMode && authManager.isAdmin()) {
+                makeEditable('documentationTab');
+            }
+        };
+
+        const originalRenderHardware = renderHardware;
+        renderHardware = function() {
+            const hw = currentProduct.hardware;
+            const html = `
+                <div class="editable-content">
+                    <h3>Transceivers</h3>
+                    <p>${hw.transceivers.join(', ')}</p>
+                    
+                    <h3>Power Supplies</h3>
+                    <p>${hw.powerSupplies.join(', ')}</p>
+                    
+                    <h3>Cables</h3>
+                    <p>${hw.cables.join(', ')}</p>
+                    
+                    <h3>Adapters</h3>
+                    <p>${hw.adapters.join(', ')}</p>
+                    
+                    <h3>Rack Mounting</h3>
+                    <p>${hw.rackMounting.join(', ')}</p>
+                </div>
+            `;
+            document.getElementById('hardwareTab').innerHTML = html;
+            if (editMode && authManager.isAdmin()) {
+                makeEditable('hardwareTab');
+            }
+        };
+
+        const originalRenderReleases = renderReleases;
+        renderReleases = function() {
+            const html = `
+                <div class="editable-content">
+                    <h3>Supported Releases</h3>
+                    <ul>
+                        ${currentProduct.supportedReleases.map(release => `<li>${release}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            document.getElementById('releasesTab').innerHTML = html;
+            if (editMode && authManager.isAdmin()) {
+                makeEditable('releasesTab');
+            }
+        };
+
+        const originalRenderRoadmap = renderRoadmap;
+        renderRoadmap = function() {
+            const html = `
+                <div class="editable-content">
+                    <h3>Product Roadmap (SOPD)</h3>
+                    <p>${currentProduct.roadmap}</p>
+                </div>
+            `;
+            document.getElementById('roadmapTab').innerHTML = html;
+            if (editMode && authManager.isAdmin()) {
+                makeEditable('roadmapTab');
+            }
+        };
+    </script>
+</body>
+</html>
